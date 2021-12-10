@@ -34,43 +34,23 @@
 ;                                             #:left-pad-string "0")
 ;                                         ".txt")))
 
-; POST answer
-
-; Request
-;
-; POST /2020/day/11/answer HTTP/2
+; GET puzzle input
+; ----------------
+; 
+; GET /2021/day/1/input HTTP/2
 ; Host: adventofcode.com
-; User-Agent: {{browser}}
-; Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+; User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0
+; Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
 ; Accept-Language: en-US,en;q=0.5
 ; Accept-Encoding: gzip, deflate, br
-; Content-Type: application/x-www-form-urlencoded
-; Content-Length: 28
-; Origin: https://adventofcode.com
+; Referer: https://adventofcode.com/2021/day/1
 ; Connection: keep-alive
-; Referer: https://adventofcode.com/2020/day/11
-; Cookie: session={{session-id}}; _ga={{id}}
+; Cookie: session=nope
 ; Upgrade-Insecure-Requests: 1
+; Sec-Fetch-Dest: document
+; Sec-Fetch-Mode: navigate
+; Sec-Fetch-Site: same-origin
 ; DNT: 1
 ; Sec-GPC: 1
-;
-; level=1&answer=2024782584832
-
-; Response
-;
-; HTTP/2 200 OK
-; date: Sat, 22 May 2021 23:43:54 GMT
-; content-type: text/html
-; content-length: 1970
-; server: Apache
-; server-ip: 172.31.61.174
-; vary: Accept-Encoding
-; content-encoding: gzip
-; strict-transport-security: max-age=300
-; X-Firefox-Spdy: h2
-;
-; ...
-; <main>
-; <article><p>That's not the right answer; your answer is too high.  If you're stuck, make sure you're using the full input data; there are also some general tips on the <a href="/2020/about">about page</a>, or you can ask for hints on the <a href="https://www.reddit.com/r/adventofcode/" target="_blank">subreddit</a>.  Please wait one minute before trying again. (You guessed <span style="white-space:nowrap;"><code>2024782584832</code>.)</span> <a href="/2020/day/11">[Return to Day 11]</a></p></article>
-; </main>
-; ...
+; Cache-Control: max-age=0
+; TE: trailers
