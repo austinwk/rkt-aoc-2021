@@ -27,11 +27,18 @@
                  increases)
             depth)))
 
-(displayln (solve-part-1))
-
 ;;------------------------------------------------------------------------------
 ;; Part 2
 ;;------------------------------------------------------------------------------
 
-(define (solve-part-2)
-  (error "unimplemented"))
+(define (solve-part-2) ;=> 1311
+  (define input (get-input))
+  (for/fold ([cnt 0]
+             [prv +inf.0]
+             #:result cnt)
+            ([a (in-list (drop-right input 2))]
+             [b (in-list (drop (drop-right input 1) 1))]
+             [c (in-list (drop input 2))])
+    (if (> (+ a b c) prv)
+        (values (add1 cnt) (+ a b c))
+        (values cnt (+ a b c)))))
