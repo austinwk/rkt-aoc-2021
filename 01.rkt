@@ -21,7 +21,7 @@
   (for*/fold ([increases 0]
               [prev-depth +inf.0]
               #:result increases)
-              ([depth (in-list (get-input))])
+             ([depth (in-list (get-input))])
     (values (if (< prev-depth depth)
                  (add1 increases)
                  increases)
