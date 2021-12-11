@@ -24,7 +24,7 @@
   (for/fold ([horiz 0]
              [depth 0]
              #:result (* horiz depth))
-             ([command (in-list (get-input))])
+            ([command (in-list (get-input))])
     (define direction (first command))
     (define distance (second command))
     (match direction
@@ -36,5 +36,15 @@
 ;; Part 2
 ;;------------------------------------------------------------------------------
 
-(define (solve-part-2)
-  (error "unimplemented"))
+(define (solve-part-2) ;=> 1963088820
+  (for/fold ([horiz 0]
+             [depth 0]
+             [aim 0]
+             #:result (* horiz depth))
+            ([command (in-list (get-input))])
+    (define direction (first command))
+    (define distance (second command))
+    (match direction
+      ["up" (values horiz depth (- aim distance))]
+      ["down" (values horiz depth (+ aim distance))]
+      ["forward" (values (+ horiz distance) (+ depth (* aim distance)) aim)])))
