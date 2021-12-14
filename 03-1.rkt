@@ -1,10 +1,17 @@
 #lang racket
 
 ;;------------------------------------------------------------------------------
-;; Day 3
+;; Day 3 Part 1
 ;;------------------------------------------------------------------------------
 
 (define input-path "03.txt")
+
+(define (solve-part-1) ;=> 2967914
+  (for/fold ([rows 0]
+             [tally '(0 0 0 0 0 0 0 0 0 0 0 0)]
+             #:result (power-consumption tally rows))
+            ([bits (in-list (get-input))])
+    (values (add1 rows) (tally-bits tally bits))))
 
 (define (get-input) ;=> list<list<number>>
   (call-with-input-file
@@ -16,17 +23,6 @@
 (define (bitstr->bitlist str) ;=> list<number>
   (for/list ([c (in-string str)])
     (if (eq? c #\0) 0 1)))
-
-;;------------------------------------------------------------------------------
-;; Part 1
-;;------------------------------------------------------------------------------
-
-(define (solve-part-1) ;=> 2967914
-  (for/fold ([rows 0]
-             [tally '(0 0 0 0 0 0 0 0 0 0 0 0)]
-             #:result (power-consumption tally rows))
-            ([bits (in-list (get-input))])
-    (values (add1 rows) (tally-bits tally bits))))
 
 (define (tally-bits tally bits) ;=> list<number>
   (for/list ([t (in-list tally)]
@@ -47,10 +43,3 @@
 
 (define (power-consumption tally rows) ;=> number
   (* (gamma-rate tally rows) (epsilon-rate tally rows)))
-
-;;------------------------------------------------------------------------------
-;; Part 2
-;;------------------------------------------------------------------------------
-
-(define (solve-part-2)
-  (error "unimplemented"))
