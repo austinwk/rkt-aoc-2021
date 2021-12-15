@@ -7,7 +7,10 @@
 (define input-path "03.txt")
 
 (define (solve-part-2)
-  (error "unimplemented"))
+  (define input (get-input))
+  (define oxy-bitvec (find-one input oxy-comparator))
+  (define co2-bitvec (find-one input co2-comparator))
+  (life-support-rating (bitvec->rating oxy-bitvec) (bitvec->rating oxy-bitvec)))
 
 (define (get-input) ;=> list<vec<number>>
   (call-with-input-file
@@ -19,6 +22,12 @@
 (define (bitstr->bitvec str) ;=> vec<number>
   (for/vector ([c (in-string str)])
     (if (eq? c #\0) 0 1)))
+
+(define (bitvec->rating bitvec) ;=> number
+  (for/fold ([bitstr ""]
+             #:result (string->number bitstr 2))
+            ([bit (in-vector bitvec)])
+    (string-append bitstr (number->string bit))))
 
 (define (find-one bits comparator)
   (for/fold ([candidates bits]
@@ -37,28 +46,22 @@
         (values zeros (cons bitvec ones)))))
 
 (define (oxy-comparator zeros ones) ;=> list<vec<number>>
-    (define zero-len (vector-length zeros))
-    (define ones-len (vector-length ones))
+    (define zero-len (length zeros))
+    (define ones-len (length ones))
     (cond
-      [(zero-len > ones-len) zeros]
-      [(zero-len < ones-len) ones]
+      [(> zero-len ones-len) zeros]
+      [(> zero-len ones-len) ones]
       [else ones]))
 
 (define (co2-comparator zeros ones) ;=> list<vec<number>>
-    (define zero-len (vector-length zeros))
-    (define ones-len (vector-length ones))
+    (define zero-len (length zeros))
+    (define ones-len (length ones))
     (cond
-      [(zero-len > ones-len) ones]
-      [(zero-len < ones-len) zeros]
+      [(> zero-len ones-len) ones]
+      [(< zero-len ones-len) zeros]
       [else zeros]))
 
 (define (life-support-rating oxy-gen-rtg co2-scrub-rtg) ;=> number
   oxy-gen-rtg * co2-scrub-rtg)
 
-; find most common bit for pos, then filter out any bit-string that doesn't have that bit for pos. Prefer 1.
-; least common, filter, prefer 0
-
-; #(1 0 1 0 1 0)
-; #(0 1 0 1 0 1)
-; #(1 0 1 0 1 0)
-; #(0 1 0 1 0 1)
+(displayln (solve-part-2))
