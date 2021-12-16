@@ -77,7 +77,7 @@
 
 (module+ test
   (require rackunit)
-    (define normalized-input
+    (define sample-data
       '(#(0 0 1 0 0)
         #(1 1 1 1 0)
         #(1 0 1 1 0)
@@ -92,19 +92,19 @@
         #(0 1 0 1 0)))
 
     (test-case "parse-input"
-      (check-equal? (file->data sample-input-path) normalized-input))
+      (check-equal? (file->data sample-input-path) sample-data))
 
     (test-case "bitvec->num"
       (check-eq? (bitvec->num #(0 1 1 0 1 1 0 1 0 1)) 437))
 
     (test-case "oxy-rating"
-      (check-eq? (oxy-rating normalized-input) 23))
+      (check-eq? (oxy-rating sample-data) 23))
 
     (test-case "co2-rating"
-      (check-eq? (co2-rating normalized-input) 10))
+      (check-eq? (co2-rating sample-data) 10))
 
     (test-case "life-rating"
-      (check-eq? (life-rating normalized-input) 230))
+      (check-eq? (life-rating sample-data) 230))
 
     (test-case "solve"
       (check-eq? (solve) 7041258)))
