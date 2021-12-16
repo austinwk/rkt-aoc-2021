@@ -12,8 +12,6 @@
 (define (solve)
   (life-rating (file->data input-path)))
 
-
-
 (define (file->data path)
   (call-with-input-file
     path
