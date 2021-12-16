@@ -5,63 +5,84 @@
 ;;------------------------------------------------------------------------------
 
 (define input-path "03.txt")
+(define sample-input-path "03-sample.txt")
 
-(define (solve-part-2)
-  (define input (get-input))
-  (define oxy-bitvec (find-one input oxy-comparator))
-  (define co2-bitvec (find-one input co2-comparator))
-  (life-support-rating (bitvec->rating oxy-bitvec) (bitvec->rating oxy-bitvec)))
-
-(define (get-input) ;=> list<vec<number>>
+(define (parse-input file-path) ;=> list<vec<num>>
   (call-with-input-file
-    input-path
-    (λ (in)
-      (for/list ([line (in-lines in)])
-        (bitstr->bitvec line)))))
+    file-path
+    (lambda (file-port)
+      (for/list ([line (in-lines file-port)])
+        (list->vector (map (λ (c)
+                             (if (eq? c #\0) 0 1))
+                           (string->list line)))))))
 
-(define (bitstr->bitvec str) ;=> vec<number>
-  (for/vector ([c (in-string str)])
-    (if (eq? c #\0) 0 1)))
+(define (oxygen-rating data)
+  (define num-cols (vector-length (car data)))
+  (for/fold ([remaining data]
+             #:result (bitvec->num (car remaining)))
+            ([col-idx (in-range num-cols)])
+             #:break (= 1 (length remaining))
+    (filter-on-col remaining col-idx)))
 
-(define (bitvec->rating bitvec) ;=> number
-  (for/fold ([bitstr ""]
-             #:result (string->number bitstr 2))
-            ([bit (in-vector bitvec)])
-    (string-append bitstr (number->string bit))))
-
-(define (find-one bits comparator)
-  (for/fold ([candidates bits]
-             #:result (car candidates))
-            ([col (in-range 12)]
-             #:break (= 1 (length candidates)))
-    (filter-bits candidates col comparator)))
-
-(define (filter-bits bits col comparator)
+(define (filter-on-col data col)
   (for/fold ([zeros '()]
              [ones '()]
-             #:result (comparator zeros ones))
-            ([bitvec (in-list bits)])
-    (if (= 0 (vector-ref bitvec col))
-        (values (cons bitvec zeros) ones)
-        (values zeros (cons bitvec ones)))))
+             #:result (cond
+                        [(> (length zeros) (length ones)) zeros]
+                        [(< (length zeros) (length ones)) ones]
+                        [else ones]))
+            ([row (in-list data)])
+    (if (= 0 (vector-ref row col))
+        (values (cons row zeros) ones)
+        (values zeros (cons row ones)))))
 
-(define (oxy-comparator zeros ones) ;=> list<vec<number>>
-    (define zero-len (length zeros))
-    (define ones-len (length ones))
-    (cond
-      [(> zero-len ones-len) zeros]
-      [(> zero-len ones-len) ones]
-      [else ones]))
+(define (bitvec->num bitvec)
+  (for/fold ([str ""]
+             #:result (string->number str 2))
+            ([bit (in-vector bitvec)])
+    (string-append str (number->string bit))))
 
-(define (co2-comparator zeros ones) ;=> list<vec<number>>
-    (define zero-len (length zeros))
-    (define ones-len (length ones))
-    (cond
-      [(> zero-len ones-len) ones]
-      [(< zero-len ones-len) zeros]
-      [else zeros]))
+(define (solve-part-2) 0)
 
-(define (life-support-rating oxy-gen-rtg co2-scrub-rtg) ;=> number
-  oxy-gen-rtg * co2-scrub-rtg)
+;;------------------------------------------------------------------------------
+;; Tests
+;;------------------------------------------------------------------------------
 
-(displayln (solve-part-2))
+(module+ test
+  (require rackunit)
+    (define normalized-input
+      '(#(0 0 1 0 0)
+        #(1 1 1 1 0)
+        #(1 0 1 1 0)
+        #(1 0 1 1 1)
+        #(1 0 1 0 1)
+        #(0 1 1 1 1)
+        #(0 0 1 1 1)
+        #(1 1 1 0 0)
+        #(1 0 0 0 0)
+        #(1 1 0 0 1)
+        #(0 0 0 1 0)
+        #(0 1 0 1 0)))
+
+    (test-case "parse-input"
+      (check-equal? (parse-input sample-input-path)
+                    normalized-input))
+
+    (test-case "bitvec->num"
+      (check-eq? (bitvec->num #(0 1 1 0 1 1 0 1 0 1))
+                 437))
+
+    (test-case "filter-on-col"
+      (check-equal? (filter-on-col normalized-input 0)
+                    ; The procedure reverses the list during filtering
+                    '(#(1 1 0 0 1)
+                      #(1 0 0 0 0)
+                      #(1 1 1 0 0)
+                      #(1 0 1 0 1)
+                      #(1 0 1 1 1)
+                      #(1 0 1 1 0)
+                      #(1 1 1 1 0))))
+
+    (test-case "oxygen-rating"
+      (check-eq? (oxygen-rating normalized-input) 23))
+)
