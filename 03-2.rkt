@@ -9,6 +9,8 @@
 
 
 
+(module+ main (displayln (solve)))
+
 (define (solve)
   (life-rating (file->data input-path)))
 
