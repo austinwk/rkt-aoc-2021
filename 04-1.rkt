@@ -29,6 +29,11 @@
     (for/and ([n (in-vector row)])
       (eq? #t n))))
 
+(define (bingo-in-cols? board)
+  (for/or ([i (in-range (vector-length (vector-ref board 0)))])
+    (for/and ([row (in-vector board)])
+      (eq? #t (vector-ref row i)))))
+
 ;;------------------------------------------------------------------------------
 ;; Tests
 ;;------------------------------------------------------------------------------
@@ -80,4 +85,17 @@
                                              #(#t 11 10 #t  4)
                                              #(#t 13 #t #t #t)))
                            #f))
+    (test-case "bingo-in-cols?"
+      (check-equal? (bingo-in-cols? #(#(14 #t 17 #t  4)
+                                      #(10 #t 15 #t 19)
+                                      #(18  8 23 #t 20)
+                                      #(#t #t #t #t #t)
+                                      #( 2 #t 12 #t  7)))
+                    #t)
+      (check-equal? (bingo-in-cols? #(#(14 #t 17 #t  4)
+                                      #(10 #t 15 12 19)
+                                      #(18  8 23 #t 20)
+                                      #(#t #t #t #t #t)
+                                      #( 2 #t 12 #t  7)))
+                    #f))
   )
