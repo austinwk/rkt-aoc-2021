@@ -23,6 +23,17 @@
 
 
 
+(define (score-board board num)
+  (for/fold ([board-total 0]
+             #:result (* board-total num))
+            ([row (in-vector board)])
+    (for/fold ([row-total 0]
+               #:result (+ row-total board-total))
+              ([n (in-vector row)])
+      (if (eq? #t n)
+          row-total
+          (+ n row-total)))))
+
 (define (seek-n-dob! board num)
   (define dobbed? #f)
   (for ([row (in-vector board)])
@@ -113,7 +124,9 @@
                   #f))
 
   (test-case "seek-n-dob"
-    (define t-board (vector (vector 22 13 17 11  0) ; #(...) is immutable
+    ; When called during the normal op of the program, this procedure will be given mutable vectors.
+    ; `#(...)` produces an immutable vector, so I cannot use it here to stage test input.
+    (define t-board (vector (vector 22 13 17 11  0)
                             (vector  8  2 23  4 24)
                             (vector 21  9 14 16  7)
                             (vector  6 10  3 18  5)
@@ -125,4 +138,13 @@
                             #( 6 10  3 #t  5)
                             #( 1 12 20 15 19)))
     (check-eq? n-dobbed? #t))
+
+  (test-case "score-board"
+    (check-eq? (score-board #(#(#t  2 #t #t  5)  ;  7
+                              #( 1 #t  3  4  5)  ; 13
+                              #( 1  2  3 #t #t)  ;  6
+                              #( 1 #t  3  4  5)  ; 13
+                              #(#t  2  3 #t  5)) ; 10
+                            3)                   ; 49
+               147))
 )
