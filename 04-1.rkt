@@ -23,6 +23,26 @@
 
 
 
+(define (play-bingo boards nums)
+  (when (empty? nums) (error "Solution not found"))
+  (let iter ([dobbed '()] [not-dobbed boards] [calls nums])
+    (define board (car not-dobbed))
+    (define num (car calls))
+    (define dobbed-board (seek-n-dob! board num))
+    (cond
+      [(bingo? dobbed-board) (score-board dobbed-board num)]
+      [(empty? not-dobbed) (play-bingo dobbed nums)]
+      [else (iter (cons dobbed-board dobbed) (cdr not-dobbed) (cdr nums))])))
+
+(define (find-bingo boards)
+  (for/first ([board (in-list boards)]
+              #:when (bingo? board))
+    board))
+
+(define (call-num! boards num)
+  (for/list ([board (in-list boards)])
+    (seek-n-dob! board num)))
+
 (define (score-board board num)
   (for/fold ([board-total 0]
              #:result (* board-total num))
@@ -35,13 +55,11 @@
           (+ n row-total)))))
 
 (define (seek-n-dob! board num)
-  (define dobbed? #f)
   (for ([row (in-vector board)])
     (for ([i (in-range (vector-length row))])
       (when (eq? num (vector-ref row i))
-        (vector-set! row i #t)
-        (set! dobbed? #t))))
-  (values board dobbed?))
+        (vector-set! row i #t))))
+  board)
 
 (define (bingo? board)
   (or (bingo-in-rows? board)
@@ -64,23 +82,21 @@
 (module+ test
   (require rackunit)
   (define nums '(7 4 9 5 11 17 23 2 0 14 21 24 10 16 13 6 15 25 12 22 18 20 8 19 3 26 1))
-  (define boards '(#(#(22 13 17 11  0)
-                     #( 8  2 23  4 24)
-                     #(21  9 14 16  7)
-                     #( 6 10  3 18  5)
-                     #( 1 12 20 15 19))
-
-                   #(#( 3 15  0  2 22)
-                     #( 9 18 13 17  5)
-                     #(19  8  7 25 23)
-                     #(20 11 10 24  4)
-                     #(14 21 16 12  6))
-
-                   #(#(14 21 17 24  4)
-                     #(10 16 15  9 19)
-                     #(18  8 23 26 20)
-                     #(22 11 13  6  5)
-                     #( 2  0 12  3  7))))
+  (define boards (list (vector (vector 22 13 17 11  0)
+                               (vector  8  2 23  4 24)
+                               (vector 21  9 14 16  7)
+                               (vector  6 10  3 18  5)
+                               (vector  1 12 20 15 19))
+                       (vector (vector  3 15  0  2 22)
+                               (vector  9 18 13 17  5)
+                               (vector 19  8  7 25 23)
+                               (vector 20 11 10 24  4)
+                               (vector 14 21 16 12  6))
+                       (vector (vector 14 21 17 24  4)
+                               (vector 10 16 15  9 19)
+                               (vector 18  8 23 26 20)
+                               (vector 22 11 13  6  5)
+                               (vector  2  0 12  3  7))))
 
   (test-case "parse-data"
              (define-values (tnums tboards) (parse-data sample-input-path))
@@ -124,20 +140,17 @@
                   #f))
 
   (test-case "seek-n-dob"
-    ; When called during the normal op of the program, this procedure will be given mutable vectors.
-    ; `#(...)` produces an immutable vector, so I cannot use it here to stage test input.
-    (define t-board (vector (vector 22 13 17 11  0)
-                            (vector  8  2 23  4 24)
-                            (vector 21  9 14 16  7)
-                            (vector  6 10  3 18  5)
-                            (vector  1 12 20 15 19)))
-    (define-values (n-board n-dobbed?) (seek-n-dob! t-board 18))
-    (check-equal? n-board #(#(22 13 17 11  0)
-                            #( 8  2 23  4 24)
-                            #(21  9 14 16  7)
-                            #( 6 10  3 #t  5)
-                            #( 1 12 20 15 19)))
-    (check-eq? n-dobbed? #t))
+    (check-equal? (seek-n-dob! (vector (vector 22 13 17 11  0)
+                                       (vector  8  2 23  4 24)
+                                       (vector 21  9 14 16  7)
+                                       (vector  6 10  3 18  5)
+                                       (vector  1 12 20 15 19))
+                               18)
+                  #(#(22 13 17 11  0)
+                    #( 8  2 23  4 24)
+                    #(21  9 14 16  7)
+                    #( 6 10  3 #t  5)
+                    #( 1 12 20 15 19))))
 
   (test-case "score-board"
     (check-eq? (score-board #(#(#t  2 #t #t  5)  ;  7
@@ -147,4 +160,7 @@
                               #(#t  2  3 #t  5)) ; 10
                             3)                   ; 49
                147))
+
+  (test-case "play-bingo"
+    (check-eq? (play-bingo boards nums) 49860))
 )
