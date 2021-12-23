@@ -9,6 +9,14 @@
 
 
 
+(module+ main (displayln (solve)))
+
+(define (solve)
+  (let-values ([(nums boards) (parse-data input-path)])
+    (play-bingo boards nums)))
+
+
+
 (define (parse-data path)
   (define chunks (string-split (file->string path) "\n\n"))
   (define nums (map string->number (string-split (first chunks) ",")))
@@ -25,14 +33,14 @@
 
 (define (play-bingo boards nums)
   (when (empty? nums) (error "Solution not found"))
-  (let iter ([dobbed '()] [not-dobbed boards] [calls nums])
-    (define board (car not-dobbed))
-    (define num (car calls))
+  (define num (first nums))
+  (let iter ([dobbed '()] [not-dobbed boards])
+    (define board (first not-dobbed))
     (define dobbed-board (seek-n-dob! board num))
     (cond
       [(bingo? dobbed-board) (score-board dobbed-board num)]
-      [(empty? not-dobbed) (play-bingo dobbed nums)]
-      [else (iter (cons dobbed-board dobbed) (cdr not-dobbed) (cdr nums))])))
+      [(= 1 (length not-dobbed)) (play-bingo (cons dobbed-board dobbed) (cdr nums))]
+      [else (iter (cons dobbed-board dobbed) (cdr not-dobbed))])))
 
 (define (find-bingo boards)
   (for/first ([board (in-list boards)]
@@ -162,5 +170,7 @@
                147))
 
   (test-case "play-bingo"
-    (check-eq? (play-bingo boards nums) 49860))
-)
+    (check-eq? (play-bingo boards nums) 4512))
+
+  (test-case "solve"
+    (check-eq? (solve) 49860)))
